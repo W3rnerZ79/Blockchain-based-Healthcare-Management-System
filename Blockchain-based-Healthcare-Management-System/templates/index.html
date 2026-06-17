@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain Healthcare Management Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 40px; color: #333; }
+        .container { max-width: 600px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h2 { color: #2c3e50; margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        label { display: block; margin: 12px 0 6px; font-weight: 600; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #3498db; color: white; border: none; padding: 12px 20px; margin-top: 15px; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+        button:hover { background: #2980b9; }
+        .btn-verify { background: #2ecc71; }
+        .btn-verify:hover { background: #27ae60; }
+        #responseBox { padding: 15px; background: #222; color: #00ff00; font-family: monospace; border-radius: 4px; margin-top: 15px; white-space: pre-wrap; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>➕ Add New Health Block</h2>
+        <label>User Identity:</label>
+        <input type="text" id="username" placeholder="e.g., Dr. Zach">
+        
+        <label>Item / Medicine Name:</label>
+        <input type="text" id="itemName" placeholder="e.g., Amoxicillin">
+        
+        <label>Quantity:</label>
+        <input type="number" id="quantity" placeholder="e.g., 100">
+        
+        <button onclick="submitBlock()">Add Block to Chain</button>
+    </div>
+
+    <div class="container">
+        <h2>🛡️ System Operations</h2>
+        <button class="btn-verify" onclick="runAudit()">Run Security Audit Scan</button>
+        
+        <h3>📟 Live API Server Response:</h3>
+        <div id="responseBox">System idling. Waiting for user action...</div>
+    </div>
+
+    <script>
+        // JavaScript logic to talk to your Python endpoints seamlessly
+        async function submitBlock() {
+            const u = document.getElementById('username').value;
+            const item = document.getElementById('itemName').value;
+            const qty = parseInt(document.getElementById('quantity').value);
+            const box = document.getElementById('responseBox');
+
+            box.innerText = "Sending cryptographic payload...";
+
+            const response = await fetch('/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, item_name: item, quantity: qty })
+            });
+            
+            const data = await response.json();
+            box.innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function runAudit() {
+            const box = document.getElementById('responseBox');
+            box.innerText = "Running network audit...";
+
+            const response = await fetch('/verify');
+            const data = await response.json();
+            box.innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>
