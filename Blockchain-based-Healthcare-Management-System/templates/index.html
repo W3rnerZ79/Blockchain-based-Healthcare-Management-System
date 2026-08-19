@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain Healthcare Management Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f6f9; margin: 40px; color: #333; }
+        .container { max-width: 600px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h2 { color: #2c3e50; margin-top: 0; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        label { display: block; margin: 12px 0 6px; font-weight: 600; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #3498db; color: white; border: none; padding: 12px 20px; margin-top: 15px; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; font-weight: bold; }
+        button:hover { background: #2980b9; }
+        .btn-verify { background: #2ecc71; }
+        .btn-verify:hover { background: #27ae60; }
+        #responseBox { padding: 15px; background: #222; color: #00ff00; font-family: monospace; border-radius: 4px; margin-top: 15px; white-space: pre-wrap; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- AUTHENTICATION SCREEN -->
+    <!-- ========================================== -->
+    <div id="authScreen" style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
+        
+        <div class="container" style="max-width: 400px; width: 100%; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border-radius: 12px; background: white; margin: 0;">
+            
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="border-bottom: none; margin: 0; color: #2c3e50; font-size: 24px;">🏥 Portal Access</h2>
+                <p style="color: #7f8c8d; margin-top: 5px; font-size: 14px;">Secure Blockchain Healthcare System</p>
+            </div>
+            
+            <!-- Login Section -->
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 14px; color: #34495e;">Username</label>
+                <input type="text" id="authUsername" placeholder="Enter username" style="width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #dfe6e9; border-radius: 6px; background: #fdfdfd;">
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <label style="font-size: 14px; color: #34495e;">Password</label>
+                <input type="password" id="authPassword" placeholder="••••••••" style="width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #dfe6e9; border-radius: 6px; background: #fdfdfd;">
+            </div>
+            
+            <button onclick="loginUser()" style="background: #3498db; width: 100%; padding: 14px; border-radius: 6px; font-size: 16px; margin-bottom: 20px; transition: 0.3s;">Secure Login</button>
+            
+            <!-- Divider -->
+            <div style="display: flex; align-items: center; text-align: center; margin: 20px 0;">
+                <div style="flex: 1; height: 1px; background: #ecf0f1;"></div>
+                <span style="padding: 0 15px; color: #95a5a6; font-size: 12px; font-weight: bold; text-transform: uppercase;">Or Create Account</span>
+                <div style="flex: 1; height: 1px; background: #ecf0f1;"></div>
+            </div>
+            
+            <!-- Registration Section -->
+            <select id="authRole" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dfe6e9; border-radius: 6px; background: #f8f9fa; color: #2c3e50; font-weight: 600;">
+                <option value="patient">Register as Patient</option>
+                <option value="doctor">Register as Doctor</option>
+            </select>
+            
+            <button onclick="registerUser()" style="background: #ecf0f1; color: #2c3e50; width: 100%; padding: 14px; border-radius: 6px; font-size: 16px; transition: 0.3s;">Create New Identity</button>
+            
+            <!-- Alert Message Area -->
+            <div id="authMessage" style="margin-top: 20px; font-weight: bold; text-align: center; font-size: 14px; min-height: 20px;"></div>
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MAIN DASHBOARD -->
+    <!-- ========================================== -->
+    <div id="dashboardScreen" style="display: none; flex-direction: column; gap: 20px;">
+        
+        <!-- Header & Logout -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            <h3 style="margin: 0;">Welcome, <span id="displayUsername" style="color: #3498db;"></span> (<span id="displayRole"></span>)</h3>
+            <button onclick="logoutUser()" style="width: auto; margin: 0; background: #e74c3c;">Logout</button>
+        </div>
+
+        <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
+
+            <!-- LEFT COLUMN: DOCTOR CONTROLS (Hidden for Patients) -->
+            <div id="doctorControls" style="flex: 1; min-width: 350px; max-width: 500px;">
+                
+                <div class="container" style="max-width: 100%;">
+                    <h2>➕ Issue Prescription</h2>
+                    
+                    <label>Patient Username:</label>
+                    <input type="text" id="patientId" placeholder="e.g., patientJohn">
+
+                    <label>Item / Medicine Name:</label>
+                    <input type="text" id="itemName" placeholder="e.g., Amoxicillin">
+                    
+                    <label>Quantity:</label>
+                    <input type="number" id="quantity" placeholder="e.g., 100">
+                    
+                    <button onclick="submitBlock()">Prescribe to Patient</button>
+                </div>
+
+                <div class="container" style="max-width: 100%;">
+                    <h2>🛡️ System Operations</h2>
+                    <button class="btn-verify" onclick="runAudit()">Run Security Audit Scan</button>
+                    <h3>📟 Live API Server Response:</h3>
+                    <div id="responseBox">System idling. Waiting for user action...</div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: The Ledger (Visible to Everyone) -->
+            <div style="flex: 2; min-width: 600px;">
+                <div class="container" style="max-width: 100%;">
+                    <h2>🔗 Live Supply Chain Ledger</h2>
+                    
+                    <!-- Notice we added an id to this container -->
+                    <div id="ledgerControls" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button onclick="fetchBlocks(false)" style="margin: 0; background: #3498db;">🔄 Refresh Full Ledger</button>
+                        <button onclick="fetchBlocks(true)" style="margin: 0; width: auto; background: #f39c12;">View My Records</button>
+                        <button onclick="fetchBlocks(false)" style="margin: 0; width: auto; background: #95a5a6;">Clear Filter</button>
+                    </div>
+
+                    <!-- We added a dedicated refresh button JUST for patients -->
+                    <button id="patientRefresh" onclick="fetchBlocks(true)" style="display: none; margin-bottom: 15px; background: #3498db;">🔄 Refresh My Ledger</button>
+                    
+                    <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #ecf0f1;">
+                                <th style="padding: 10px; border-bottom: 2px solid #ccc;">Block #</th>
+                                <th style="padding: 10px; border-bottom: 2px solid #ccc;">Patient</th>
+                                <th style="padding: 10px; border-bottom: 2px solid #ccc;">Medicine</th>
+                                <th style="padding: 10px; border-bottom: 2px solid #ccc;">Quantity</th>
+                                <th style="padding: 10px; border-bottom: 2px solid #ccc;">Prescribed By</th>
+                                <th style="padding: 10px; border-bottom: 2px solid #ccc;">Hash Signature</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledgerTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ========================================== -->
+    <script>
+        // --- AUTHENTICATION LOGIC ---
+        async function registerUser() {
+            const u = document.getElementById('authUsername').value;
+            const p = document.getElementById('authPassword').value;
+            const r = document.getElementById('authRole').value;
+            const msg = document.getElementById('authMessage');
+
+            const response = await fetch('http://localhost:5000/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p, role: r })
+            });
+            const data = await response.json();
+            msg.style.color = response.ok ? 'green' : 'red';
+            msg.innerText = data.message || data.error;
+        }
+
+        async function loginUser() {
+            const u = document.getElementById('authUsername').value;
+            const p = document.getElementById('authPassword').value;
+            const msg = document.getElementById('authMessage');
+
+            const response = await fetch('http://localhost:5000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('secureBadge', data.token);
+                localStorage.setItem('username', u);
+                localStorage.setItem('userRole', data.role);
+                
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('dashboardScreen').style.display = 'flex';
+                document.getElementById('displayUsername').innerText = u;
+                document.getElementById('displayRole').innerText = data.role.toUpperCase();
+
+                // STRICT UI LOGIC: Hide controls and global filters from the patient
+                const doctorControls = document.getElementById('doctorControls');
+                const ledgerControls = document.getElementById('ledgerControls');
+                const patientRefresh = document.getElementById('patientRefresh');
+                
+                if (data.role === 'patient') {
+                    doctorControls.style.display = 'none';
+                    ledgerControls.style.display = 'none'; // Hide global filters
+                    patientRefresh.style.display = 'block'; // Show personal refresh button
+                } else {
+                    doctorControls.style.display = 'block';
+                    ledgerControls.style.display = 'flex'; // Show global filters
+                    patientRefresh.style.display = 'none'; // Hide personal refresh button
+                }
+                
+                fetchBlocks(true); // Auto-filter to their own records on login
+            } else {
+                msg.style.color = 'red';
+                msg.innerText = data.error;
+            }
+        }
+
+        async function fetchBlocks(filterByUser = false) {
+            const tableBody = document.getElementById('ledgerTableBody');
+            tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px;">Loading blockchain data...</td></tr>';
+
+            const token = localStorage.getItem('secureBadge');
+            const myUsername = localStorage.getItem('username');
+            const myRole = localStorage.getItem('userRole');
+            
+            let url = 'http://localhost:5000/blocks';
+            
+            // SECURITY: If they are a patient, lock them to their personal URL
+            if (filterByUser || myRole === 'patient') {
+                url = `http://localhost:5000/blocks/user/${encodeURIComponent(myUsername)}`;
+            }
+
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const blocks = await response.json();
+                tableBody.innerHTML = ''; 
+
+                // Prevent JS crashes if the server sends an error message instead of an array
+                if (!Array.isArray(blocks)) {
+                    const errorMessage = blocks.error || "Authentication failed. Please log in again.";
+                    tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red; padding:10px;">${errorMessage}</td></tr>`;
+                    return;
+                }
+
+                if (blocks.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:10px; color:#7f8c8d;">No medical records found.</td></tr>';
+                    return;
+                }
+
+                blocks.forEach(block => {
+                    const tr = document.createElement('tr');
+                    const shortHash = block.current_hash ? block.current_hash.substring(0, 15) + '...' : 'N/A';
+                    tr.innerHTML = `
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>${block.block_index}</strong></td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; color: #8e44ad; font-weight: bold;">${block.patient_id || '-'}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">${block.item_name || '-'}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">${block.quantity || '-'}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">${block.created_by}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; font-family: monospace;" title="${block.current_hash}">${shortHash}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+            } catch (error) {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red; padding:10px;">Failed to load data. Ensure server is running.</td></tr>';
+            }
+        }
+
+        function logoutUser() {
+            // Destroy the badge and reset UI
+            localStorage.clear();
+            document.getElementById('dashboardScreen').style.display = 'none';
+            
+            // This is the magic fix! Changed from 'block' to 'flex'
+            document.getElementById('authScreen').style.display = 'flex'; 
+            
+            document.getElementById('authUsername').value = '';
+            document.getElementById('authPassword').value = '';
+            document.getElementById('authMessage').innerText = '';
+        }
+
+        // --- BLOCKCHAIN LOGIC ---
+        async function submitBlock() {
+            const patient = document.getElementById('patientId').value;
+            const item = document.getElementById('itemName').value;
+            const qty = parseInt(document.getElementById('quantity').value);
+            const box = document.getElementById('responseBox');
+            
+            // Retrieve token to prove identity
+            const token = localStorage.getItem('secureBadge');
+
+            box.innerText = "Sending cryptographic payload...";
+
+            const response = await fetch('http://localhost:5000/add', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ patient_id: patient, item_name: item, quantity: qty })
+            });
+            
+            const data = await response.json();
+            box.innerText = JSON.stringify(data, null, 2);
+            
+            fetchBlocks(false);
+        }
+
+        async function runAudit() {
+            const box = document.getElementById('responseBox');
+            box.innerText = "Running network audit...";
+            const response = await fetch('http://localhost:5000/verify');
+            const data = await response.json();
+            box.innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>
