@@ -16,7 +16,7 @@ app.use(express.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: 'Nov03@00$o4',
     database: 'blockchain-based-healthcare-management-system'
 };
 
